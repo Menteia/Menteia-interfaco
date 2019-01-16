@@ -1,4 +1,4 @@
-import {legiDosieron} from "./vortaro";
+import {legiDosieron} from "vortaro";
 
 legiDosieron().then((vortaro) => {
   for (const [m, e] of vortaro) {
