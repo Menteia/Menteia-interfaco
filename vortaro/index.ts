@@ -5,16 +5,18 @@ const vortaroDosiero = "vortaro.txt";
 
 export function legiDosieron(): Promise<Map<string, [string, number]>> {
   const rl = readline.createInterface(fs.createReadStream(vortaroDosiero));
-  const vortaroPostaĵo = new Promise<Map<string, [string, number]>>((resolve, reject) => {
-    const vortaro = new Map<string, [string, number]>();
-    rl.on("line", vico => {
-      const [m, e, n] = vico.split("/");
-      vortaro.set(m, [e, parseInt(n)]);
-    });
-    rl.on("close", () => {
-      resolve(vortaro);
-    });
-  });
+  const vortaroPostaĵo = new Promise<Map<string, [string, number]>>(
+    (resolve, reject) => {
+      const vortaro = new Map<string, [string, number]>();
+      rl.on("line", vico => {
+        const [m, e, n] = vico.split("/");
+        vortaro.set(m, [e, parseInt(n)]);
+      });
+      rl.on("close", () => {
+        resolve(vortaro);
+      });
+    }
+  );
   return vortaroPostaĵo;
 }
 

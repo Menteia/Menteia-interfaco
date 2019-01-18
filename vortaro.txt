@@ -6,4 +6,4 @@ bis/<frazo>/2
 fitam/<frazo>/1
 pona/unu/0
 nevum/grado/1
-nori/du/0
+nora/du/0

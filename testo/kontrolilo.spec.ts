@@ -8,7 +8,7 @@ const ĝi = it;
 describe("la kontrolilo funkcias per vortaro", () => {
   const vortoj: { [K: string]: [string, number] } = {
     saleri: ["pluvo", 0],
-    lumina: ["vetero", 0],
+    lumina: ["vetero", 0]
   };
   const kontrolilo = new Kontrolilo(new Map(Object.entries(vortoj)));
 
@@ -27,13 +27,21 @@ describe("la kontrolilo funkcias per vortaro", () => {
   });
 
   ĝi("montras la pravajn silaboj", () => {
-    expect(Array.from(kontrolilo.silaboj("marika"))).to.eql(["ma", "ri", "ka"]);
-    expect(Array.from(kontrolilo.silaboj("bis"))).to.eql(["bis"]);
-    expect(Array.from(kontrolilo.silaboj("salekres"))).to.eql(["sa", "le", "kres"]);
+    expect(Array.from(Kontrolilo.silaboj("marika"))).to.eql(["ma", "ri", "ka"]);
+    expect(Array.from(Kontrolilo.silaboj("bis"))).to.eql(["bis"]);
+    expect(Array.from(Kontrolilo.silaboj("salekres"))).to.eql([
+      "sa",
+      "le",
+      "kres"
+    ]);
   });
 
   ĝi("malakceptas la invalidajn vortojn", () => {
-    expect(() => { Array.from(kontrolilo.silaboj("mar")); }).to.throw();
-    expect(() => { Array.from(kontrolilo.silaboj("sra")); }).to.throw();
+    expect(() => {
+      Array.from(Kontrolilo.silaboj("mar"));
+    }).to.throw();
+    expect(() => {
+      Array.from(Kontrolilo.silaboj("sra"));
+    }).to.throw();
   });
 });

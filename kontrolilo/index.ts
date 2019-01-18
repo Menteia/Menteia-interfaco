@@ -21,14 +21,14 @@ export class Kontrolilo {
     return true;
   }
 
-  *silaboj(vorto: string): IterableIterator<string> {
+  static *silaboj(vorto: string): IterableIterator<string> {
     const aŭtomato = new FiniaAŭtomato();
     let aktuala: Array<string> = [];
     let i = 0;
     for (const litero of vorto) {
       if (aŭtomato.ĉuFinita()) {
         if (finoj.has(litero)) {
-          if (!vokaloj.has(vorto[i+1])) {
+          if (!vokaloj.has(vorto[i + 1])) {
             aktuala.push(litero);
             yield aktuala.join("");
             aktuala = [];
@@ -59,29 +59,38 @@ export class Kontrolilo {
 }
 
 type literoTipo = "vokalo" | "k1" | "k2" | "k3" | "fino" | "nenio" | "nasala";
-type stato = "malplena" | "k1" | "k2" | "k3" | "k1k2" | "k1k2V" | "k1V" | "k2V" | "k3V";
+type stato =
+  | "malplena"
+  | "k1"
+  | "k2"
+  | "k3"
+  | "k1k2"
+  | "k1k2V"
+  | "k1V"
+  | "k2V"
+  | "k3V";
 
 const finajStatoj = new Set<stato>(["k1k2V", "k1V", "k2V", "k3V"]);
 
 const transiroj: { [S in stato]?: { [L in literoTipo]?: stato } } = {
-  "malplena": {
+  malplena: {
     k1: "k1",
     k2: "k2",
     k3: "k3",
-    nasala: "k2",
+    nasala: "k2"
   },
-  "k1": {
+  k1: {
     k2: "k1k2",
-    vokalo: "k1V",
+    vokalo: "k1V"
   },
-  "k2": {
-    vokalo: "k2V",
+  k2: {
+    vokalo: "k2V"
   },
-  "k3": {
-    vokalo: "k3V",
+  k3: {
+    vokalo: "k3V"
   },
-  "k1k2": {
-    vokalo: "k1k2V",
+  k1k2: {
+    vokalo: "k1k2V"
   }
 };
 
@@ -104,7 +113,9 @@ class FiniaAŭtomato {
       if (novaStato) {
         this.stato = novaStato;
       } else {
-        throw new Error(`Nevalida transiro de ${this.stato} per ${novaLitero} de tipo ${tipo}`);
+        throw new Error(
+          `Nevalida transiro de ${this.stato} per ${novaLitero} de tipo ${tipo}`
+        );
       }
     }
   }
