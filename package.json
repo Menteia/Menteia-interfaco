@@ -9,12 +9,17 @@
   "author": "Sam Wang",
   "license": "MIT",
   "dependencies": {
+    "@types/inquirer": "0.0.43",
     "@types/node": "^10.12.18",
-    "typescript": "^3.2.2"
+    "aws-sdk": "^2.389.0",
+    "inquirer": "^6.2.1",
+    "typescript": "^3.2.2",
+    "xmlbuilder": "^10.1.1"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.5",
+    "@types/xmlbuilder": "0.0.34",
     "chai": "^4.2.0",
     "mocha": "^5.2.0",
     "ts-node": "^7.0.1"

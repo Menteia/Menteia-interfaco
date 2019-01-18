@@ -1,1 +1,9 @@
-saleri/pluvo
+saleri/pluvo/0
+sagi/<frazo>/1
+to/<frazo>/2
+bis/<frazo>/2
+ʃevara/temperaturo/0
+fitam/<frazo>/1
+pona/unu/0
+nevum/grado/1
+nori/du/0
