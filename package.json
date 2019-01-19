@@ -1,7 +1,7 @@
 {
-  "name": "menteia-vortaro",
+  "name": "menteia-cerbo",
   "version": "0.0.1",
-  "description": "Lexicon manager for Menteia",
+  "description": "Central brain for Menteia",
   "main": "enirejo.ts",
   "scripts": {
     "test": "mocha -r ts-node/register testo/**/*.spec.ts"
@@ -9,16 +9,21 @@
   "author": "Sam Wang",
   "license": "MIT",
   "dependencies": {
+    "@types/dotenv": "^6.1.0",
     "@types/inquirer": "0.0.43",
     "@types/node": "^10.12.18",
     "aws-sdk": "^2.389.0",
+    "dotenv": "^6.2.0",
     "inquirer": "^6.2.1",
+    "moment": "^2.23.0",
+    "request": "^2.88.0",
     "typescript": "^3.2.2",
     "xmlbuilder": "^10.1.1"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.5",
+    "@types/request": "^2.48.1",
     "@types/xmlbuilder": "0.0.34",
     "chai": "^4.2.0",
     "mocha": "^5.2.0",

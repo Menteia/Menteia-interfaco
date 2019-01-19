@@ -22,15 +22,23 @@ export class Legilo {
   }
 
   kompreni(silaboj: string): SintaksoArbo {
-    const vortoj = this.vortigi(silaboj);
+    const vortoj = this.vortigi(silaboj.replace(/\s/g, ""));
     const unuaVorto = vortoj.next().value;
     const ano = this.vortaro.get(unuaVorto);
     if (!ano) throw new Error(`Nevalida vorto: ${unuaVorto}`);
     const opcioj = ano[1];
+    console.log(`${unuaVorto}/${ano[1]}`);
     return {
       radiko: unuaVorto,
       opcioj: this.konstruiArbon(opcioj, vortoj),
     };
+  }
+
+  static *traversi(arbo: SintaksoArbo): IterableIterator<string> {
+    yield arbo.radiko;
+    for (const subarbo of arbo.opcioj) {
+      yield* Legilo.traversi(subarbo);
+    }
   }
 
   private konstruiArbon(opcioj: number, vortoj: IterableIterator<string>): Array<SintaksoArbo> {
@@ -38,6 +46,7 @@ export class Legilo {
       const sekvaVorto = vortoj.next().value;
       const ano = this.vortaro.get(sekvaVorto);
       if (!ano) throw new Error(`Nevalida vorto: ${sekvaVorto}`);
+      console.log(`${sekvaVorto}/${ano[1]}`);
       return {
         radiko: sekvaVorto,
         opcioj: this.konstruiArbon(ano[1], vortoj),

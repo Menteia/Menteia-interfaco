@@ -2,8 +2,10 @@ import * as fs from "fs";
 import * as readline from "readline";
 
 const vortaroDosiero = "vortaro.txt";
+let legitaVortaro: Map<string, [string, number]> | undefined;
 
-export function legiDosieron(): Promise<Map<string, [string, number]>> {
+export async function legiDosieron(): Promise<Map<string, [string, number]>> {
+  if (legitaVortaro) return legitaVortaro;
   const rl = readline.createInterface(fs.createReadStream(vortaroDosiero));
   const vortaroPostaĵo = new Promise<Map<string, [string, number]>>(
     (resolve, reject) => {
@@ -13,7 +15,8 @@ export function legiDosieron(): Promise<Map<string, [string, number]>> {
         vortaro.set(m, [e, parseInt(n)]);
       });
       rl.on("close", () => {
-        resolve(vortaro);
+        legitaVortaro = vortaro;
+        resolve(legitaVortaro);
       });
     }
   );

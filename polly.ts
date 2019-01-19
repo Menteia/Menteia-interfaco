@@ -3,6 +3,9 @@ import * as AWS from "aws-sdk";
 import xmlbuilder from "xmlbuilder";
 
 import { Kontrolilo } from "./kontrolilo";
+import { SintaksoArbo, Legilo } from "./legilo";
+
+const paŭzajVortoj = new Set(['brotas', 'premis']);
 
 const polly = new AWS.Polly({
   region: "us-east-1"
@@ -12,17 +15,34 @@ const t1 = "sə'gi to bis lu'minə fitəm ponə trisə sə'leri";
 const t2 = "sə'gi to bis ʃe'varə fitəm ponə nevum nori";
 const t3 = "və'lono";
 
-export function paroli(vortoj: Array<string>, dosiernomo: string) {
-  const IPA = igiIPA(vortoj);
+export function paroli(arbo: SintaksoArbo, dosiernomo: string) {
   const ssml = xmlbuilder
-    .create("speak")
-    .ele("prosody", { rate: "77%", pitch: "+13%" })
-    .ele("phoneme", { alphabet: "ipa", ph: IPA })
-    .end({ allowEmpty: false });
+    .create("speak");
+  const parolo = ssml.ele("prosody", { rate: "77%", pitch: "+7%", volume: "+6dB" });
+
+  let vortoj: Array<string> = [];
+  for (const vorto of Legilo.traversi(arbo)) {
+    if (paŭzajVortoj.has(vorto)) {
+      const IPA = igiIPA(vortoj);
+      parolo.ele("phoneme", { alphabet: "ipa", ph: IPA.join(" ") });
+      parolo.ele("break");
+      vortoj = [vorto];
+    } else {
+      vortoj.push(vorto);
+    }
+  }
+
+  if (vortoj.length > 0) {
+    parolo.ele("phoneme", { alphabet: "ipa", ph: igiIPA(vortoj).join(" ") });
+  }
+
+  const teksto = ssml.end({ allowEmpty: false });
+  console.log(teksto);
+
   polly.synthesizeSpeech(
     {
       OutputFormat: "ogg_vorbis",
-      Text: ssml,
+      Text: teksto,
       VoiceId: "Ivy",
       TextType: "ssml"
     },
@@ -30,13 +50,13 @@ export function paroli(vortoj: Array<string>, dosiernomo: string) {
       if (error) {
         throw error;
       } else {
-        fs.writeFileSync(dosiernomo, data.AudioStream);
+        fs.writeFileSync("ekparolado/" + dosiernomo, data.AudioStream);
       }
     }
   );
 }
 
-export function igiIPA(vortoj: Array<string>): string {
+export function igiIPA(vortoj: Array<string>): Array<string> {
   const IPA: Array<string> = [];
   for (const vorto of vortoj) {
     switch (vorto) {
@@ -56,7 +76,7 @@ export function igiIPA(vortoj: Array<string>): string {
         break;
       case 3:
         IPA.push(
-          `${silaboj[0].replace("a", "ə")}'${silaboj[1]}${silaboj[2].replace(
+          `${silaboj[0].replace(/a/g, "ə")}'${silaboj[1].replace('e', 'eɪ')}${silaboj[2].replace(
             "a",
             "ə"
           )}`
@@ -66,5 +86,5 @@ export function igiIPA(vortoj: Array<string>): string {
         throw new Error(`Nevalida vorto: ${vorto}`);
     }
   }
-  return IPA.join(" ");
+  return IPA;
 }

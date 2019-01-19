@@ -1,20 +1,23 @@
+import { config } from "dotenv";
+config();
+
 import * as readline from "readline";
 import * as inquirer from "inquirer";
+import moment from "moment";
 
 import { legiDosieron, konserviDosieron } from "./vortaro";
+import { Legilo } from "./legilo";
 import { Kontrolilo } from "./kontrolilo";
 import { paroli } from "./polly";
+import { respondi } from "./cerbo";
 
 interface Respondo {
   eniro: string;
 }
 
 legiDosieron().then(vortaro => {
-  for (const [m, [e, n]] of vortaro) {
-    console.log(`${m}/${n} - ${e}`);
-  }
-
   const kontrolilo = new Kontrolilo(vortaro);
+  const legilo = new Legilo(vortaro);
 
   const eniri = () => {
     inquirer
@@ -38,19 +41,22 @@ legiDosieron().then(vortaro => {
             } else {
               if (kontrolilo.validas(vorto)) {
                 vortaro.set(vorto, [partoj[2], parseInt(partoj[3])]);
+                konserviDosieron(vortaro);
               } else {
                 console.log(`${vorto} ne estas valida.`);
               }
             }
             break;
           case "eliri":
-            konserviDosieron(vortaro);
             return;
           case "paroli":
-            paroli(partoj.slice(1), partoj.slice(1).join(" ") + ".ogg");
+            const arbo = legilo.kompreni(partoj.slice(1).join(""));
+            paroli(arbo, partoj.slice(1).join(" ") + ".ogg");
             break;
           default:
-            console.log("Nevalida eniro");
+            respondi(legilo.kompreni(eniro)).then((respondo) => {
+              paroli(respondo, moment().format('YYYY-MM-DD HHmmss') + ".ogg");
+            });
             break;
         }
         eniri();
