@@ -65,14 +65,12 @@ export function kreiVortojn(nombro: number): string {
   nombro = Math.round(nombro);
   const gulos = nombro < 0;
   nombro = Math.abs(nombro);
-  console.log(nombro);
   while (nombro >= 10) {
     const cifero = nombro % 10;
     vortoj.unshift((vortoj.length === 0 ? nombroj1 : nombroj2)[cifero]);
     nombro /= 10;
   }
-  console.log(nombro);
-  vortoj.unshift((vortoj.length === 0 ? nombroj1 : nombroj2)[Math.round(nombro)]);
+  vortoj.unshift((vortoj.length === 0 ? nombroj1 : nombroj2)[Math.floor(nombro)]);
   if (gulos) {
     vortoj.unshift("gulos");
   }

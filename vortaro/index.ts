@@ -1,3 +1,4 @@
+import * as AWS from "aws-sdk";
 import * as fs from "fs";
 import * as readline from "readline";
 

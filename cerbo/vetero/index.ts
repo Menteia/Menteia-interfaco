@@ -1,4 +1,5 @@
 import * as request from "request";
+import moment from "moment";
 
 import { aldoni, trovi } from "../";
 import { legiDaton, kreiVortojn } from "../iloj";
@@ -49,7 +50,11 @@ const urboj = new Map<string, number>([
 ]);
 
 function estontaURL(loko: number): string {
-  return `https://api.openweathermap.org/data/2.5/forecast?id=${loko}&appid=${process.env.OPENWEATHERMAP_API_KEY}`;
+  return `https://api.openweathermap.org/data/2.5/forecast?id=${loko}&appid=${process.env.OPENWEATHERMAP_API_KEY}&units=metric`;
+}
+
+function aktualaURL(loko: number) {
+  return `https://api.openweathermap.org/data/2.5/weather?id=${loko}&appid=${process.env.OPENWEATHERMAP_API_KEY}&units=metric`;
 }
 
 aldoni("lurina", async ([datoNomo, lokoNomo]) => {
@@ -63,24 +68,76 @@ aldoni("lurina", async ([datoNomo, lokoNomo]) => {
   return new Promise((akcepti, malakepti) => {
     request.get(estontaURL(loko), (eraro, respondo, korpo) => {
       const datumo: Respondo = JSON.parse(korpo);
-      let vetero = null;
-      for (const ano of datumo.list) {
-        if (dato.isSame(ano.dt_txt, "hour")) {
-          vetero = ano;
-          break;
-        }
+      const teksto = kreiRaporton(dato, datumo);
+      if (teksto == null) {
+        throw new Error(`Neniu datumo por ${dato.format()}`);
       }
-      if (!vetero) {
-        throw new Error(datoNomo.radiko);
-      }
-      const lumina = kodoj[vetero.weather[0].id];
-      const respondoTeksto = `sagi peras tres ${Array.from(Legilo.traversi(datoNomo)).join(" ")} gesmi
-brotas to bis lumina gesmi ${lumina}
-brotas to besra ʃevara nevum ${kreiVortojn(vetero.main.temp - 273)}
-brotas to besra ferana posetim ${kreiVortojn(vetero.wind.speed * 3.6)}
-premis`;
-      console.log(respondoTeksto);
-      akcepti(legilo.kompreni(respondoTeksto));
+      console.log(teksto);
+      akcepti(legilo.kompreni(`sagi to lurina ${Array.from(Legilo.traversi(datoNomo)).join(" ")} ${lokoNomo.radiko} ${teksto}`));
     });
   });
 });
+
+aldoni("lemona", async ([lokoNomo]) => {
+  const loko = urboj.get(lokoNomo.radiko);
+  if (!loko) {
+    throw new Error(lokoNomo.radiko);
+  }
+  const vortaro = await legiDosieron();
+  const legilo = new Legilo(vortaro);
+  return new Promise((akcepti, malakepti) => {
+    request.get(aktualaURL(loko), (eraro, respondo, korpo) => {
+      const datumo: Raportano = JSON.parse(korpo);
+      const teksto = kreiAktualanRaporton(datumo);
+      if (teksto == null) {
+        throw new Error(`Neniu datumo por hodiaŭ`);
+      }
+      console.log(teksto);
+      akcepti(legilo.kompreni(`sagi to lemona ${lokoNomo.radiko} ${teksto}`));
+    });
+  });
+});
+
+function kreiAktualanRaporton(datumo: Raportano): string {
+  const lumina = kodoj[datumo.weather[0].id];
+  return `luvana ${lumina} nevum ${kreiVortojn(datumo.main.temp)} posetim ${kreiVortojn(datumo.wind.speed * 3.6)}`;
+}
+
+function kreiRaporton(dato: moment.Moment, datumo: Respondo): string | null {
+  let vetero = null;
+  for (const ano of datumo.list) {
+    if (dato.isSame(ano.dt_txt, "hour")) {
+      vetero = ano;
+      break;
+    }
+  }
+  if (vetero == null) return null;
+  const lumina = kodoj[vetero.weather[0].id];
+  const raporto = [`luvana ${lumina} nevum ${kreiVortojn(vetero.main.temp)} posetim ${kreiVortojn(vetero.wind.speed * 3.6)}`];
+
+  let pluvo = 0;
+  let neĝo = 0;
+  for (const ano of datumo.list) {
+    if (dato.isSame(ano.dt_txt, "day")) {
+      if (ano.rain && ano.rain["3h"]) {
+        pluvo += ano.rain["3h"];
+      }
+      if (ano.snow && ano.snow["3h"]) {
+        neĝo += ano.snow["3h"];
+      }
+    }
+  }
+
+  if (pluvo > 0) {
+    raporto.push(`vem saleri glima senam ${kreiVortojn(pluvo * 3)}`);
+  }
+  if (neĝo > 0) {
+    raporto.push(`vem varumi glima senam ${kreiVortojn(neĝo * 3)}`);
+  }
+
+  if (raporto.length === 1) {
+    return raporto[0];
+  } else {
+    return `brotas ${raporto.join(" brotas ")} premis`;
+  }
+}

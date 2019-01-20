@@ -1,6 +1,6 @@
 import { SintaksoArbo } from "../legilo";
 
-type Respondilo = (opcioj: Array<SintaksoArbo>) => Promise<SintaksoArbo>;
+export type Respondilo = (opcioj: Array<SintaksoArbo>) => Promise<SintaksoArbo>;
 
 const respondiloj: Map<string, Respondilo> = new Map<string, Respondilo>();
 respondiloj.set("keli", ([opcio]) => {
@@ -8,6 +8,12 @@ respondiloj.set("keli", ([opcio]) => {
   if (!sekva) throw new Error(opcio.radiko);
   return sekva(opcio.opcioj);
 });
+
+respondiloj.set("doni", ([opcio]) => {
+  const sekva = respondiloj.get(opcio.radiko);
+  if (!sekva) throw new Error(opcio.radiko);
+  return sekva(opcio.opcioj);
+}))
 
 export async function respondi(eniro: SintaksoArbo): Promise<SintaksoArbo> {
   try {

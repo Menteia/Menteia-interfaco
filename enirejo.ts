@@ -54,9 +54,13 @@ legiDosieron().then(vortaro => {
             paroli(arbo, partoj.slice(1).join(" ") + ".ogg");
             break;
           default:
-            respondi(legilo.kompreni(eniro)).then((respondo) => {
-              paroli(respondo, moment().format('YYYY-MM-DD HHmmss') + ".ogg");
-            });
+            try {
+              respondi(legilo.kompreni(eniro)).then((respondo) => {
+                paroli(respondo, moment().format('YYYY-MM-DD HHmmss') + ".ogg");
+              });
+            } catch (e) {
+              console.error(e);
+            }
             break;
         }
         eniri();

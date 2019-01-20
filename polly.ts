@@ -5,8 +5,6 @@ import xmlbuilder from "xmlbuilder";
 import { Kontrolilo } from "./kontrolilo";
 import { SintaksoArbo, Legilo } from "./legilo";
 
-const paŭzajVortoj = new Set(['brotas', 'premis']);
-
 const polly = new AWS.Polly({
   region: "us-east-1"
 });
@@ -17,16 +15,23 @@ const t3 = "və'lono";
 
 export function paroli(arbo: SintaksoArbo, dosiernomo: string) {
   const ssml = xmlbuilder
-    .create("speak");
-  const parolo = ssml.ele("prosody", { rate: "77%", pitch: "+7%", volume: "+6dB" });
+    .create("speak")
+    .ele("amazon:effect", {"vocal-tract-length": "+7%"});
+  const parolo = ssml.ele("prosody", { rate: "70%", volume: "+6dB" });
 
   let vortoj: Array<string> = [];
-  for (const vorto of Legilo.traversi(arbo)) {
-    if (paŭzajVortoj.has(vorto)) {
+  for (const vorto of Legilo.traversi(arbo, {paŭzoj: true})) {
+    if (vorto.startsWith("!")) {
       const IPA = igiIPA(vortoj);
       parolo.ele("phoneme", { alphabet: "ipa", ph: IPA.join(" ") });
-      parolo.ele("break");
-      vortoj = [vorto];
+      if (vorto === "!paŭzo") {
+        parolo.ele("break", { strength: "weak" });
+      } else if (vorto === "!longapaŭzo") {
+        parolo.ele("break");
+      } else {
+        throw new Error(`Nevalida vorto: ${vorto}`);
+      }
+      vortoj = [];
     } else {
       vortoj.push(vorto);
     }
