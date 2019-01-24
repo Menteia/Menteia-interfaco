@@ -5,7 +5,7 @@ import * as readline from "readline";
 import * as inquirer from "inquirer";
 import moment from "moment";
 
-import { aldoniVorton, transferi } from "./vortaro";
+import { aldoniVorton } from "./vortaro";
 
 interface Respondo {
   eniro: string;
