@@ -4,7 +4,7 @@ import * as readline from "readline";
 
 const db = new AWS.DynamoDB({region: 'us-west-2'});
 const lambda = new AWS.Lambda({region: 'us-east-1'});
-const tabeloNomo = "Menteia-vortaro";
+const tabeloNomo = "Menteia-datumejo";
 
 export async function aldoniVorton(vorto: string, valenco: string): Promise<AWS.DynamoDB.PutItemOutput> {
   return new Promise((akcepti, malakcepti) => {
