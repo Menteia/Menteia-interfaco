@@ -63,3 +63,62 @@ export async function aldoniVorton(vorto: string, valenco: string): Promise<AWS.
     })
   });
 }
+
+export async function agordiTipon(vortoj: Array<string>, tipo: string, aktantoj: Array<string>, genera: boolean, tipaktantoj: Array<string>): Promise<void> {
+  return new Promise((fini, fiaksi) => {
+    vortoj.forEach((vorto) => {
+      db.getItem({
+        TableName: tabeloNomo,
+        Key: {
+          vorto: {
+            S: vorto
+          }
+        }
+      }, (err, data) => {
+        if (err != null) {
+          throw err;
+        } else if (data.Item != null) {
+          const v = data.Item.valenco.N;
+          if (v == null) {
+            fiaksi(`Ne eblas trovi la valencon de ${vorto}`);
+          } else {
+            const valenco = parseInt(v);
+            if (aktantoj.length !== valenco) {
+              fiaksi(`La valenco de ${vorto} kaj la longeco de la aktantoj ne estas la sama`);
+            } else {
+              db.updateItem({
+                TableName: tabeloNomo,
+                Key: {
+                  vorto: {
+                    S: vorto
+                  }
+                },
+                UpdateExpression: "SET tipo = :t, aktantoj = :a, genera = :g, tipaktantoj = :ta",
+                ExpressionAttributeValues: {
+                  ":t": {
+                    S: tipo
+                  },
+                  ":a": {
+                    L: aktantoj.map((a) => ({S: a}))
+                  },
+                  ":g": {
+                    BOOL: genera
+                  },
+                  ":ta": {
+                    L: tipaktantoj.map((a) => ({S: a})),
+                  }
+                }
+              }, (err, data) => {
+                if (err) {
+                  fiaksi(err);
+                } else {
+                  fini();
+                }
+              });
+            }
+          }
+        }
+      });
+    });
+  });
+}
