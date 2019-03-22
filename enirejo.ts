@@ -11,6 +11,17 @@ interface Respondo {
   eniro: string;
 }
 
+interface Tipagordo {
+  tipo: string,
+  aktantoj: string
+}
+
+interface Novavorto {
+  vorto: string,
+  tipo: string,
+  aktantoj: string
+}
+
 const eniri = () => {
   inquirer
     .prompt<Respondo>([
@@ -23,25 +34,51 @@ const eniri = () => {
       const partoj = eniro.split(" ");
       switch (partoj[0]) {
         case "aldoni":
-          const vorto = partoj[1];
-          aldoniVorton(vorto, partoj[2]).catch((e) => {
-            console.error(e);
-          }).then((data) => {
-            console.log(data);
-          }).finally(() => {
-            eniri();
+          inquirer.prompt<Novavorto>([
+            {
+              name: "vorto",
+              message: "Vorto"
+            },
+            {
+              name: "tipo",
+              message: "Tipo",
+            },
+            {
+              name: "aktantoj",
+              message: "Aktantoj"
+            }
+          ]).then(({vorto, tipo, aktantoj}) => {
+            if (tipo.length === 0) {
+              throw "Necesas tipon";
+            }
+            aldoniVorton(vorto, tipo, aktantoj.length === 0 ? [] : aktantoj.split(" ")).catch((e) => {
+              console.error(e);
+            }).then((data) => {
+              console.log(data);
+            }).finally(() => {
+              eniri();
+            });
           });
           break;
         case "agordi":
           const vortoj = partoj[1].split(",");
-          const tipo = partoj[2];
-          const aktantoj = partoj[3] == null ? [] : partoj[3].split(",");
-          const genera = partoj[4] === "v";
-          const tipaktantoj = partoj[5] == null ? [] : partoj[5].split(",");
-          agordiTipon(vortoj, tipo, aktantoj, genera, tipaktantoj).catch((e) => {
-            console.error(e);
-          }).finally(() => {
-            eniri();
+          inquirer.prompt<Tipagordo>([
+            {
+              name: "tipo",
+              message: "Tipo"
+            },
+            {
+              name: "aktantoj",
+              message: "aktantoj"
+            }
+          ]).then((agordo) => {
+            const tipo = agordo.tipo;
+            const aktantoj = agordo.aktantoj.length === 0 ? [] : agordo.aktantoj.split(" ");
+            agordiTipon(vortoj, tipo, aktantoj).catch((e) => {
+              console.error(e);
+            }).finally(() => {
+              eniri();
+            });
           });
           break;
         case "eliri":
